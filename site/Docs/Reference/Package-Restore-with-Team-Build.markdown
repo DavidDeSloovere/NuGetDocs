@@ -105,44 +105,38 @@ The result looks as follows:
 
 	<?xml version="1.0" encoding="utf-8"?>
 	<Project ToolsVersion="4.0"
-	         DefaultTargets="Build" 
-	         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	
-	  <PropertyGroup>
-	    <OutDir>$(MSBuildThisFileDirectory)bin</OutDir>
-	    <Configuration>Release</Configuration>
-	    <ProjectProperties>
-	        OutDir=$(OutDir);
-	        Configuration=$(Configuration);
-	    </ProjectProperties>
-	  </PropertyGroup>
-	
-	  <ItemGroup>
-	    <Solution Include="$(MSBuildThisFileDirectory)src\*.sln" />
-	  </ItemGroup>
-	
-	  <Target Name="RestorePackages">
-	    <Exec Command="&quot;$(MSBuildThisFileDirectory)tools\NuGet\NuGet.exe&quot; restore &quot;%(Solution.Identity)&quot;" />
-	  </Target>
-	
-	  <Target Name="Clean">
-	    <MSBuild Targets="Clean"
-	             Projects="@(Solution)"
-	             Properties="$(ProjectProperties)" />
-	  </Target>
-	
-	  <Target Name="Build" DependsOnTargets="RestorePackages">
-	    <MSBuild Targets="Build"
-	             Projects="@(Solution)"
-	             Properties="$(ProjectProperties)" />
-	  </Target>
-	
-	  <Target Name="Rebuild" DependsOnTargets="RestorePackages">
-	    <MSBuild Targets="Rebuild"
-	             Projects="@(Solution)"
-	             Properties="$(ProjectProperties)" />
-	  </Target>
-	
+		DefaultTargets="Build"
+		xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ 	
+  		<PropertyGroup>
+	    		<OutDir Condition=" '$(OutDir)'=='' ">$(MSBuildThisFileDirectory)bin\</OutDir>
+    			<Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
+    			<SourceHome Condition=" '$(SourceHome)'=='' ">$(MSBuildThisFileDirectory)src\</SourceHome>
+    			<ToolsHome Condition=" '$(ToolsHome)'=='' ">$(MSBuildThisFileDirectory)tools\</ToolsHome>
+  		</PropertyGroup>
+		 
+	  	<ItemGroup>
+    			<Solution Include="$(SourceHome)*.sln">
+    				<AdditionalProperties>OutDir=$(OutDir);Configuration=$(Configuration)</AdditionalProperties>
+    			</Solution>
+  		</ItemGroup>
+		 
+	  	<Target Name="RestorePackages">
+    			<Exec Command="&quot;$(ToolsHome)NuGet\NuGet.exe&quot; restore &quot;%(Solution.Identity)&quot;" />
+	  	</Target>
+	 	
+  		<Target Name="Clean">
+	    		<MSBuild Targets="Clean" Projects="@(Solution)" />
+  		</Target>
+		 
+	  	<Target Name="Build" DependsOnTargets="RestorePackages">
+    			<MSBuild Targets="Build" Projects="@(Solution)" />
+	  	</Target>
+	 	
+  		<Target Name="Rebuild" DependsOnTargets="RestorePackages">
+	    		<MSBuild Targets="Rebuild" Projects="@(Solution)" />
+  		</Target>
+		 
 	</Project>
 
 ## Configuring Team Build
